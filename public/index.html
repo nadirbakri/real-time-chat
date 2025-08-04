@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <div v-if="!username" class="username-modal">
+            <div class="modal-content">
+                <h2>Join Chat</h2>
+                <input 
+                    v-model="inputUsername" 
+                    @keyup.enter="joinChat"
+                    placeholder="Enter your name"
+                    maxlength="20"
+                    autofocus
+                >
+                <button @click="joinChat" :disabled="!inputUsername.trim()">Join</button>
+            </div>
+        </div>
+
+        <div v-else class="chat-container">
+            <div class="chat-header">
+                <h3>general</h3>
+                <div class="list-user" @click="toggleOnlineList">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </div>
+
+            <div v-if="showOnlineList" class="online-list">
+                <div v-for="user in onlineUsers" :key="user.id" class="online-user">
+                    <img :src="user.avatar" :alt="user.name" class="user-avatar">
+                    <span>{{ user.name }}</span>
+                </div>
+            </div>
+
+            <div class="messages" ref="messagesDiv">
+                <div 
+                    v-for="msg in messages" 
+                    :key="msg.id"
+                    class="message"
+                    :class="{ 'my-message': msg.sender === username }"
+                >
+                    <img :src="msg.avatar" :alt="msg.sender" class="message-avatar">
+                    <div class="message-content">
+                        <div class="message-info">
+                            <span class="sender">{{ msg.sender }}</span>
+                        </div>
+                        <div class="text">{{ msg.text }}</div>
+                    </div>
+                </div>
+
+                <div v-if="typingUsers.length > 0" class="typing">
+                    {{ getTypingText() }}
+                </div>
+            </div>
+
+            <div class="input-area">
+                <input 
+                    v-model="currentMessage"
+                    @keyup.enter="sendMessage"
+                    @input="handleTyping"
+                    @focus="inputFocused = true"
+                    @blur="inputFocused = false"
+                    placeholder="Type a message..."
+                    maxlength="500"
+                    ref="messageInput"
+                    :class="{ 'focused': inputFocused }"
+                >
+                <button @click="sendMessage" :disabled="!currentMessage.trim()" class="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
